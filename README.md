@@ -1,3 +1,7 @@
+ 
+# text2sql
+NL2SQL project generated using Codex, with test accuracy metrics
+
 # Text2SQL 项目
 
 自然语言转 SQL 查询系统，支持 PostgreSQL 数据库，包含智能 SQL 生成与自动修正功能。
@@ -93,3 +97,5 @@ text2sql/
 3. **SQL 验证**: 语法检查和安全检查
 4. **多轮对话**: 支持上下文相关的查询
 5. **可视化**: 添加查询结果可视化功能
+
+ 
