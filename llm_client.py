@@ -1,15 +1,14 @@
-from openai import OpenAI
+import httpx
 from typing import Optional
 from config import config
 
 
 class LLMClient:
     def __init__(self):
-        self.client = OpenAI(
-            api_key=config.llm.api_key,
-            base_url=config.llm.api_base,
-        )
+        self.api_key = config.llm.api_key
+        self.api_base = config.llm.api_base.rstrip('/')
         self.model = config.llm.model
+        self.client = httpx.Client(timeout=60.0)
 
     def generate(
         self,
@@ -18,15 +17,23 @@ class LLMClient:
         temperature: float = 0.0,
     ) -> str:
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
+            url = f"{self.api_base}/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+            }
+            payload = {
+                "model": self.model,
+                "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ],
-                temperature=temperature,
-            )
-            return response.choices[0].message.content.strip()
+                "temperature": temperature,
+            }
+            response = self.client.post(url, json=payload, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            return data["choices"][0]["message"]["content"].strip()
         except Exception as e:
             raise Exception(f"LLM API 调用失败: {str(e)}")
 
